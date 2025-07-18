@@ -1,0 +1,8 @@
+# Binaries
+gocanarygo
+*.exe
+*.out
+
+# IDE
+.vscode/
+.idea/
