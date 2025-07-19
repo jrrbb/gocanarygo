@@ -7,6 +7,12 @@ import (
 	"github.com/jrrbb/gocanarygo/internal/kube"
 )
 
+var (
+	name     string
+	image    string
+	replicas int32
+)
+
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
 	Short: "Deploy a canary workload to your Kubernetes cluster",
@@ -17,7 +23,7 @@ var deployCmd = &cobra.Command{
 			return
 		}
 
-		err = kube.DeployCanary(clientset)
+		err = kube.DeployCanary(clientset, name, image, replicas)
 		if err != nil {
 			fmt.Println("❌ Deployment failed:", err)
 			return
@@ -28,5 +34,9 @@ var deployCmd = &cobra.Command{
 }
 
 func init() {
+	deployCmd.Flags().StringVar(&name, "name", "nginx-canary", "Name of the deployment")
+	deployCmd.Flags().StringVar(&image, "image", "nginx:1.25-alpine", "Container image to deploy")
+	deployCmd.Flags().Int32Var(&replicas, "replicas", 1, "Number of pod replicas")
+
 	rootCmd.AddCommand(deployCmd)
 }
