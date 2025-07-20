@@ -1,42 +1,33 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 
+	"gocanarygo/internal/kube"
 	"github.com/spf13/cobra"
-	"github.com/jrrbb/gocanarygo/internal/kube"
-)
-
-var (
-	name     string
-	image    string
-	replicas int32
 )
 
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
-	Short: "Deploy a canary workload to your Kubernetes cluster",
+	Short: "Deploy a Kubernetes workload",
 	Run: func(cmd *cobra.Command, args []string) {
-		clientset, err := kube.GetClientSet()
-		if err != nil {
-			fmt.Println("❌ Failed to connect to cluster:", err)
-			return
-		}
+		clientset := kube.MustConnect()
 
-		err = kube.DeployCanary(clientset, name, image, replicas)
-		if err != nil {
-			fmt.Println("❌ Deployment failed:", err)
-			return
-		}
+		name, _ := cmd.Flags().GetString("name")
+		image, _ := cmd.Flags().GetString("image")
+		replicas, _ := cmd.Flags().GetInt32("replicas")
 
-		fmt.Println("🚀 Deployment completed successfully.")
+		err := kube.CreateDeployment(clientset, name, image, replicas)
+		if err != nil {
+			log.Fatalf("❌ Deployment failed: %v", err)
+		}
 	},
 }
 
 func init() {
-	deployCmd.Flags().StringVar(&name, "name", "nginx-canary", "Name of the deployment")
-	deployCmd.Flags().StringVar(&image, "image", "nginx:1.25-alpine", "Container image to deploy")
-	deployCmd.Flags().Int32Var(&replicas, "replicas", 1, "Number of pod replicas")
+	deployCmd.Flags().String("name", "nginx", "Name of the deployment")
+	deployCmd.Flags().String("image", "nginx", "Container image")
+	deployCmd.Flags().Int32("replicas", 2, "Number of replicas")
 
 	rootCmd.AddCommand(deployCmd)
 }

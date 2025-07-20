@@ -1,6 +1,6 @@
 package main
 
-import "github.com/jrrbb/gocanarygo/cmd"
+import "gocanarygo/cmd"
 
 func main() {
 	cmd.Execute()

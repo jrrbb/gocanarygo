@@ -9,7 +9,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "gocanarygo",
-	Short: "A CLI tool for canary deployments to Kubernetes",
+	Short: "A CLI tool for canary and autoscaling deployments to Kubernetes",
 }
 
 func Execute() {
